@@ -1,0 +1,94 @@
+{% extends 'tienda/base.html' %}
+
+{% block title %}{{ producto.nombre }} | Joyería{% endblock %}
+
+{% block content %}
+
+<div class="row g-4">
+    <div class="col-md-6 text-center">
+        {% if producto.imagen %}
+            <div class="zoom-container">
+                <img 
+                    src="{{ producto.imagen.url }}" 
+                    class="img-fluid producto-zoom" 
+                    id="zoom-image"
+                    alt="{{ producto.nombre }}"
+                >
+            </div>
+            <small class="text-muted d-block mt-2">
+                Pasá el mouse sobre la imagen para verla ampliada
+            </small>
+        {% else %}
+            <div class="bg-light p-5 rounded">
+                Sin imagen
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-6">
+        <h1 style="font-family: 'Playfair Display', serif;">{{ producto.nombre }}</h1>
+
+        <p class="text-muted">{{ producto.categoria.nombre }}</p>
+
+        <h3 class="fw-bold mb-3">${{ producto.precio }}</h3>
+
+        <p>{{ producto.descripcion }}</p>
+
+        {% if producto.stock > 0 %}
+            <form method="POST" action="{% url 'agregar_al_carrito' producto.id %}" class="mt-4">
+                {% csrf_token %}
+
+                <label class="form-label">Cantidad</label>
+                <div class="input-group mb-3" style="max-width: 220px;">
+                    <input 
+                        type="number" 
+                        name="cantidad" 
+                        value="1" 
+                        min="1" 
+                        max="{{ producto.stock }}"
+                        class="form-control"
+                    >
+                    <button type="submit" class="btn btn-agregar">
+                        Agregar
+                    </button>
+                </div>
+            </form>
+        {% else %}
+            <button class="btn btn-secondary" disabled>Sin stock</button>
+        {% endif %}
+
+        <a href="{% url 'catalogo' %}" class="btn btn-outline-dark mt-3">
+            Volver al catálogo
+        </a>
+    </div>
+</div>
+
+{% if producto.imagen %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const img = document.getElementById("zoom-image");
+
+    if (!img) return;
+
+    img.addEventListener("mousemove", function (e) {
+        const rect = img.getBoundingClientRect();
+
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const xPercent = (x / rect.width) * 100;
+        const yPercent = (y / rect.height) * 100;
+
+        img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+        img.style.transform = "scale(2)";
+    });
+
+    img.addEventListener("mouseleave", function () {
+        img.style.transform = "scale(1)";
+        img.style.transformOrigin = "center center";
+    });
+});
+</script>
+{% endif %}
+
+{% endblock %}

@@ -8,6 +8,9 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.utils import timezone
+from django.core.mail import send_mail
+from .models import Producto, Categoria
+from django.contrib import messages
 
 
 sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
@@ -90,6 +93,7 @@ def actualizar_carrito(request, producto_id):
 
 
 
+
 def checkout(request):
     carrito = request.session.get("carrito", {})
 
@@ -103,24 +107,71 @@ def checkout(request):
     if request.method == "POST":
         metodo_pago = request.POST.get("metodo_pago")
 
+        # 1. Validar stock ANTES de crear el pedido
+        for key, item in carrito.items():
+            producto = get_object_or_404(Producto, id=int(key))
+
+            if producto.stock <= 0:
+                messages.error(request, f"{producto.nombre} no tiene stock disponible.")
+                return redirect("ver_carrito")
+
+            if item["cantidad"] > producto.stock:
+                messages.error(
+                    request,
+                    f"Stock insuficiente para {producto.nombre}. Disponible: {producto.stock}."
+                )
+                return redirect("ver_carrito")
+
+        # 2. Crear pedido solo si hay stock
         pedido = Pedido.objects.create(
             usuario=request.user if request.user.is_authenticated else None,
             nombre=request.POST.get("nombre"),
+            apellido=request.POST.get("apellido"),
+            dni=request.POST.get("dni"),
             email=request.POST.get("email"),
             telefono=request.POST.get("telefono"),
+            provincia=request.POST.get("provincia"),
+            ciudad=request.POST.get("ciudad"),
+            codigo_postal=request.POST.get("codigo_postal"),
             direccion=request.POST.get("direccion"),
+            detalle_direccion=request.POST.get("detalle_direccion"),
             metodo_pago=metodo_pago,
             total=total
         )
 
+        # 3. Crear items y descontar stock
         for key, item in carrito.items():
+            producto = get_object_or_404(Producto, id=int(key))
+
             ItemPedido.objects.create(
                 pedido=pedido,
-                producto_id=int(key),
+                producto=producto,
                 nombre_producto=item["nombre"],
                 precio=item["precio"],
                 cantidad=item["cantidad"]
             )
+
+            producto.stock -= item["cantidad"]
+            producto.save()
+
+        send_mail(
+            subject=f"Pedido #{pedido.id} recibido",
+            message=f"""
+Hola {pedido.nombre},
+
+Recibimos tu pedido #{pedido.id}.
+
+Total: ${pedido.total}
+Método de pago: {pedido.get_metodo_pago_display()}
+Estado: {pedido.get_estado_display()}
+
+Podés ver tu pedido acá:
+http://127.0.0.1:8005/pedido/{pedido.id}/{pedido.token}/
+""",
+            from_email=None,
+            recipient_list=[pedido.email],
+            fail_silently=True,
+        )
 
         request.session["carrito"] = {}
 
@@ -137,8 +188,6 @@ def checkout(request):
         "carrito": carrito,
         "total": total
     })
-
-
 def crear_preferencia(pedido):
     items = []
 
@@ -260,4 +309,37 @@ def ver_pedido(request, pedido_id, token):
 
     return render(request, "tienda/ver_pedido.html", {
         "pedido": pedido
+    })
+
+
+
+
+
+def catalogo(request):
+    categorias = Categoria.objects.filter(activa=True)
+    productos = Producto.objects.filter(activo=True)
+
+    return render(request, "tienda/catalogo.html", {
+        "categorias": categorias,
+        "productos": productos,
+    })
+
+
+def productos_por_categoria(request, slug):
+    categoria = get_object_or_404(Categoria, slug=slug, activa=True)
+    productos = Producto.objects.filter(categoria=categoria, activo=True)
+    categorias = Categoria.objects.filter(activa=True)
+
+    return render(request, "tienda/catalogo.html", {
+        "categorias": categorias,
+        "productos": productos,
+        "categoria_actual": categoria,
+    })
+
+
+def detalle_producto(request, slug):
+    producto = get_object_or_404(Producto, slug=slug, activo=True)
+
+    return render(request, "tienda/detalle_producto.html", {
+        "producto": producto,
     })
