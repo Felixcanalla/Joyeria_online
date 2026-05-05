@@ -1,0 +1,56 @@
+{% extends 'tienda/base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">Finalizar compra</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <div class="row">
+        <div class="col-md-6">
+
+            <input type="text" name="nombre" class="form-control mb-2" placeholder="Nombre completo" required>
+            <input type="text" name="apellido" class="form-control mb-2" placeholder="Apellido" required>
+            <input type="text" name="dni" class="form-control mb-2" placeholder="DNI" required>
+            <input type="text" name="provincia" class="form-control mb-2" placeholder="Provincia" required>
+            <input type="text" name="ciudad" class="form-control mb-2" placeholder="Ciudad" required>
+            <input type="text" name="codigo_postal" class="form-control mb-2" placeholder="Código postal" required>
+            <input type="text" name="direccion" class="form-control mb-2" placeholder="Dirección" required>
+            <input type="text" name="detalle_direccion" class="form-control mb-2" placeholder="Piso, depto, entre calles o referencia">
+            <input type="email" name="email" class="form-control mb-2" placeholder="Email" required>
+            <input type="text" name="telefono" class="form-control mb-2" placeholder="Teléfono" required>
+            <input type="text" name="direccion" class="form-control mb-2" placeholder="Dirección">
+
+            <select name="metodo_pago" class="form-control mb-3" required>
+    <option value="">Método de pago</option>
+    <option value="efectivo">Efectivo al retirar</option>
+    <option value="transferencia">Transferencia</option>
+    <option value="mercadopago">Mercado Pago</option>
+</select>
+
+        </div>
+
+        <div class="col-md-6">
+            <h5>Resumen</h5>
+
+            <ul class="list-group mb-3">
+                {% for item in carrito.values %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ item.nombre }} x{{ item.cantidad }}
+                        <span>${{ item.precio|floatformat:2 }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <h4>Total: ${{ total }}</h4>
+
+            <button class="btn btn-agregar w-100 mt-3">
+                Confirmar compra
+            </button>
+        </div>
+    </div>
+
+</form>
+
+{% endblock %}

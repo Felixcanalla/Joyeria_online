@@ -1,0 +1,34 @@
+{% extends 'tienda/base.html' %}
+
+{% block content %}
+
+<div class="mx-auto mt-4" style="max-width: 520px;">
+    <h2 class="mb-3">Pago por transferencia</h2>
+
+    <div class="alert alert-info">
+        Pedido #{{ pedido.id }} - Total: <strong>${{ pedido.total }}</strong>
+    </div>
+
+    <div class="card p-4 mb-3">
+        <p><strong>Alias:</strong> tu.alias.mp</p>
+        <p><strong>CBU:</strong> 0000000000000000000000</p>
+        <p><strong>Titular:</strong> Tu Nombre</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <label class="form-label">Subir comprobante</label>
+        <input type="file" name="comprobante" class="form-control mb-3" accept="image/*">
+
+        <button class="btn btn-agregar w-100">
+            Enviar comprobante
+        </button>
+    </form>
+
+    <a href="{% url 'inicio' %}" class="btn btn-outline-dark w-100 mt-3">
+        Subir más tarde
+    </a>
+</div>
+
+{% endblock %}

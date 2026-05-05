@@ -1,0 +1,20 @@
+{% extends 'tienda/base.html' %}
+
+{% block content %}
+
+<div class="text-center mt-5">
+    <h2>¡Pedido realizado con éxito! 🎉</h2>
+    <p>Nos contactaremos con vos a la brevedad.</p>
+
+    {% if pedido %}
+        <a href="{% url 'ver_pedido' pedido.id pedido.token %}" class="btn btn-agregar mt-3">
+    Ver mi pedido
+</a>
+    {% endif %}
+
+    <a href="{% url 'inicio' %}" class="btn btn-outline-dark mt-3">
+        Volver a la tienda
+    </a>
+</div>
+
+{% endblock %}

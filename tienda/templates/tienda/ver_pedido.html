@@ -1,0 +1,33 @@
+{% extends 'tienda/base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">Pedido #{{ pedido.id }}</h2>
+
+<div class="card p-4 mb-3">
+    <p><strong>Estado:</strong> {{ pedido.estado }}</p>
+    <p><strong>Método de pago:</strong> {{ pedido.metodo_pago }}</p>
+    <p><strong>Total:</strong> ${{ pedido.total }}</p>
+</div>
+
+<h4>Productos</h4>
+
+<ul class="list-group mb-3">
+    {% for item in pedido.items.all %}
+        <li class="list-group-item d-flex justify-content-between">
+            {{ item.nombre_producto }} x{{ item.cantidad }}
+            <span>${{ item.subtotal }}</span>
+        </li>
+    {% endfor %}
+</ul>
+
+<h4>Datos de envío</h4>
+
+<div class="card p-3">
+    <p>{{ pedido.nombre }} {{ pedido.apellido }}</p>
+    <p>{{ pedido.direccion }}</p>
+    <p>{{ pedido.ciudad }} - {{ pedido.provincia }}</p>
+    <p>CP: {{ pedido.codigo_postal }}</p>
+</div>
+
+{% endblock %}

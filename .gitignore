@@ -1,0 +1,64 @@
+# Python
+
+**pycache**/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Entorno virtual
+
+venv/
+.env/
+.env
+
+# Django
+
+*.log
+db.sqlite3
+media/
+staticfiles/
+
+# Archivos de sistema
+
+.DS_Store
+Thumbs.db
+
+# IDEs
+
+.vscode/
+.idea/
+
+# Archivos temporales
+
+*.swp
+*.swo
+
+# Archivos de compilación
+
+*.egg-info/
+dist/
+build/
+
+# Variables sensibles
+
+.env
+
+# Archivos de migración (opcional, si querés ignorarlos)
+
+# tienda/migrations/
+
+# Cloudinary (si luego agregamos configs locales)
+
+*.pem
+
+# Ngrok (si descargaste en el proyecto)
+
+ngrok.exe
+
+# Logs
+
+*.log
+
+# Backup
+
+*.bak
