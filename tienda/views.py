@@ -15,7 +15,6 @@ from django.contrib import messages
 
 sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
-print("TOKEN MP:", settings.MERCADOPAGO_ACCESS_TOKEN[:10])
 
 
 def inicio(request):

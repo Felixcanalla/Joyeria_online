@@ -62,3 +62,10 @@ ngrok.exe
 # Backup
 
 *.bak
+
+
+.env
+db.sqlite3
+media/
+__pycache__/
+*.pyc
