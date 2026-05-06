@@ -1,7 +1,5 @@
-from django.shortcuts import render
-from .models import Producto
-from django.shortcuts import redirect, get_object_or_404
-from .models import Pedido, ItemPedido
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Producto, Pedido, ItemPedido, Categoria
 import mercadopago
 from django.conf import settings
 from django.http import HttpResponse
@@ -9,23 +7,18 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.utils import timezone
 from django.core.mail import send_mail
-from .models import Producto, Categoria
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.db.models import Sum, Count
-from django.utils import timezone
+from django.db.models import Sum
 from datetime import timedelta
 import csv
-from django.http import HttpResponse
-from django.contrib.admin.views.decorators import staff_member_required
 
 
 sdk = mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
 
 
-
 def inicio(request):
-    productos = Producto.objects.filter(activo=True).order_by('-destacado')
+    productos = Producto.objects.filter(activo=True).order_by("-destacado")
 
     return render(request, "tienda/inicio.html", {
         "productos": productos
@@ -34,7 +27,6 @@ def inicio(request):
 
 def agregar_al_carrito(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id)
-
     cantidad = int(request.POST.get("cantidad", 1))
 
     carrito = request.session.get("carrito", {})
@@ -49,9 +41,7 @@ def agregar_al_carrito(request, producto_id):
         }
 
     request.session["carrito"] = carrito
-
     return redirect("inicio")
-
 
 
 def ver_carrito(request):
@@ -75,7 +65,6 @@ def eliminar_del_carrito(request, producto_id):
         del carrito[str(producto_id)]
 
     request.session["carrito"] = carrito
-
     return redirect("ver_carrito")
 
 
@@ -95,15 +84,6 @@ def actualizar_carrito(request, producto_id):
     return redirect("ver_carrito")
 
 
-
-
-
-
-
-
-
-
-
 def checkout(request):
     carrito = request.session.get("carrito", {})
 
@@ -116,7 +96,6 @@ def checkout(request):
 
     if request.method == "POST":
 
-        # 🔒 Evita doble envío del formulario
         if request.session.get("pedido_en_proceso"):
             messages.warning(request, "Ya hay un pedido en proceso.")
             return redirect("ver_carrito")
@@ -127,13 +106,13 @@ def checkout(request):
         try:
             metodo_pago = request.POST.get("metodo_pago")
 
-            # ✅ 1. Validar stock
             for key, item in carrito.items():
                 producto = get_object_or_404(Producto, id=int(key))
 
                 if producto.stock <= 0:
                     messages.error(request, f"{producto.nombre} no tiene stock disponible.")
                     request.session["pedido_en_proceso"] = False
+                    request.session.modified = True
                     return redirect("ver_carrito")
 
                 if item["cantidad"] > producto.stock:
@@ -142,9 +121,9 @@ def checkout(request):
                         f"Stock insuficiente para {producto.nombre}. Disponible: {producto.stock}."
                     )
                     request.session["pedido_en_proceso"] = False
+                    request.session.modified = True
                     return redirect("ver_carrito")
 
-            # ✅ 2. Crear pedido
             pedido = Pedido.objects.create(
                 usuario=request.user if request.user.is_authenticated else None,
                 nombre=request.POST.get("nombre"),
@@ -161,7 +140,6 @@ def checkout(request):
                 total=total
             )
 
-            # ✅ 3. Crear items y descontar stock
             for key, item in carrito.items():
                 producto = get_object_or_404(Producto, id=int(key))
 
@@ -176,77 +154,69 @@ def checkout(request):
                 producto.stock -= item["cantidad"]
                 producto.save()
 
-            # 📦 Productos en texto (para email vendedor)
             productos_texto = "\n".join([
                 f"- {item.nombre_producto} x{item.cantidad}"
                 for item in pedido.items.all()
             ])
 
-            # ✅ 4. Email al cliente
-        try:
-                send_mail(
-                subject=f"Pedido #{pedido.id} recibido",
-                message=f"""
-        Hola {pedido.nombre},
-
-        Recibimos tu pedido #{pedido.id}.
-
-        Total: ${pedido.total}
-        Método de pago: {pedido.get_metodo_pago_display()}
-        Estado: {pedido.get_estado_display()}
-
-        Podés ver tu pedido acá:
-        https://rbjoyas.onrender.com/pedido/{pedido.id}/{pedido.token}/
-        """,
-                from_email=settings.EMAIL_HOST_USER,  # 👈 IMPORTANTE
-                recipient_list=[pedido.email],
-                fail_silently=False,  # 👈 IMPORTANTE
-            )
-        except Exception as e:
-            print("Error enviando mail cliente:", e)
-            
-
-            # ✅ 5. Email al vendedor
             try:
                 send_mail(
-                    subject=f"🛒 NUEVO PEDIDO #{pedido.id}",
+                    subject=f"Pedido #{pedido.id} recibido",
                     message=f"""
-            Nuevo pedido recibido
+Hola {pedido.nombre},
 
-            Cliente: {pedido.nombre} {pedido.apellido}
-            DNI: {pedido.dni}
-            Teléfono: {pedido.telefono}
-            Email: {pedido.email}
+Recibimos tu pedido #{pedido.id}.
 
-            Dirección:
-            {pedido.direccion}, {pedido.ciudad}, {pedido.provincia}
-            CP: {pedido.codigo_postal}
+Total: ${pedido.total}
+Método de pago: {pedido.get_metodo_pago_display()}
+Estado: {pedido.get_estado_display()}
 
-            Productos:
-            {productos_texto}
+Podés ver tu pedido acá:
+https://rbjoyas.onrender.com/pedido/{pedido.id}/{pedido.token}/
+""",
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[pedido.email],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                print("Error enviando mail cliente:", e)
 
-            Total: ${pedido.total}
-            Método de pago: {pedido.get_metodo_pago_display()}
-            Estado: {pedido.get_estado_display()}
+            try:
+                send_mail(
+                    subject=f"NUEVO PEDIDO #{pedido.id}",
+                    message=f"""
+Nuevo pedido recibido
 
-            Ver pedido:
-            https://rbjoyas.onrender.com/pedido/{pedido.id}/{pedido.token}/
-            """,
-                    from_email=settings.EMAIL_HOST_USER,  # 👈 CLAVE
+Cliente: {pedido.nombre} {pedido.apellido}
+DNI: {pedido.dni}
+Teléfono: {pedido.telefono}
+Email: {pedido.email}
+
+Dirección:
+{pedido.direccion}, {pedido.ciudad}, {pedido.provincia}
+CP: {pedido.codigo_postal}
+
+Productos:
+{productos_texto}
+
+Total: ${pedido.total}
+Método de pago: {pedido.get_metodo_pago_display()}
+Estado: {pedido.get_estado_display()}
+
+Ver pedido:
+https://rbjoyas.onrender.com/pedido/{pedido.id}/{pedido.token}/
+""",
+                    from_email=settings.EMAIL_HOST_USER,
                     recipient_list=[settings.EMAIL_VENDEDOR],
-                    fail_silently=False,  # 👈 CLAVE
+                    fail_silently=False,
                 )
             except Exception as e:
                 print("Error enviando mail vendedor:", e)
 
-            # 🧹 6. Vaciar carrito
             request.session["carrito"] = {}
-
-            # 🔓 7. Liberar bloqueo
             request.session["pedido_en_proceso"] = False
             request.session.modified = True
 
-            # 🚀 8. Redirecciones según pago
             if metodo_pago == "mercadopago":
                 url_pago = crear_preferencia(pedido)
                 return redirect(url_pago)
@@ -269,10 +239,43 @@ def checkout(request):
     })
 
 
+def crear_preferencia(pedido):
+    items = []
+
+    for item in pedido.items.all():
+        items.append({
+            "title": item.nombre_producto,
+            "quantity": int(item.cantidad),
+            "unit_price": float(item.precio),
+            "currency_id": "ARS",
+        })
+
+    preference_data = {
+        "items": items,
+        "external_reference": str(pedido.id),
+        "notification_url": "https://rbjoyas.onrender.com/webhook/mercadopago/",
+        "back_urls": {
+            "success": "https://rbjoyas.onrender.com/pago-exitoso/",
+            "failure": "https://rbjoyas.onrender.com/",
+            "pending": "https://rbjoyas.onrender.com/",
+        },
+        "auto_return": "approved",
+    }
+
+    preference_response = sdk.preference().create(preference_data)
+    response = preference_response.get("response", {})
+
+    if "init_point" in response:
+        return response["init_point"]
+
+    if "sandbox_init_point" in response:
+        return response["sandbox_init_point"]
+
+    raise Exception(f"Mercado Pago no devolvió init_point: {response}")
+
+
 def pago_exitoso(request):
     return render(request, "tienda/pago_exitoso.html")
-
-
 
 
 @csrf_exempt
@@ -287,11 +290,9 @@ def mercadopago_webhook(request):
 
     payment_id = None
 
-    # Formato típico webhook
     if data.get("type") == "payment":
         payment_id = data.get("data", {}).get("id")
 
-    # Formato alternativo/IPN
     if not payment_id:
         payment_id = request.GET.get("id") or request.GET.get("data.id")
 
@@ -322,8 +323,6 @@ def mercadopago_webhook(request):
     return HttpResponse(status=200)
 
 
-
-
 def transferencia(request, pedido_id):
     pedido = get_object_or_404(Pedido, id=pedido_id)
 
@@ -341,16 +340,12 @@ def transferencia(request, pedido_id):
     })
 
 
-
 def ver_pedido(request, pedido_id, token):
     pedido = get_object_or_404(Pedido, id=pedido_id, token=token)
 
     return render(request, "tienda/ver_pedido.html", {
         "pedido": pedido
     })
-
-
-
 
 
 def catalogo(request):
@@ -381,7 +376,6 @@ def detalle_producto(request, slug):
     return render(request, "tienda/detalle_producto.html", {
         "producto": producto,
     })
-
 
 
 @staff_member_required
@@ -451,22 +445,26 @@ def dashboard_admin(request):
         "estado_actual": estado,
     })
 
-def exportar_pedidos_csv(request):
-    response = HttpResponse(content_type='text/csv; charset=utf-8')
-    response['Content-Disposition'] = 'attachment; filename="pedidos.csv"'
-    response.write('\ufeff')
 
-    writer = csv.writer(response, delimiter=';')
+@staff_member_required
+def exportar_pedidos_csv(request):
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = 'attachment; filename="pedidos.csv"'
+    response.write("\ufeff")
+
+    writer = csv.writer(response, delimiter=";")
 
     writer.writerow([
-        "ID", "Nombre", "Apellido", "Email",
-        "Ciudad", "Dirección", "Total", "Estado", "Fecha"
+        "ID", "Nombre", "Apellido", "DNI", "Email", "Telefono",
+        "Provincia", "Ciudad", "Codigo Postal", "Direccion",
+        "Detalle Direccion", "Metodo de pago", "Estado", "Total", "Fecha"
     ])
 
     pedidos = Pedido.objects.all()
 
     fecha_desde = request.GET.get("desde")
     fecha_hasta = request.GET.get("hasta")
+    estado = request.GET.get("estado")
 
     if fecha_desde:
         pedidos = pedidos.filter(creado__date__gte=fecha_desde)
@@ -474,17 +472,26 @@ def exportar_pedidos_csv(request):
     if fecha_hasta:
         pedidos = pedidos.filter(creado__date__lte=fecha_hasta)
 
+    if estado:
+        pedidos = pedidos.filter(estado=estado)
+
     for p in pedidos.order_by("-creado"):
         writer.writerow([
             p.id,
             p.nombre,
             p.apellido,
+            p.dni,
             p.email,
+            p.telefono,
+            p.provincia,
             p.ciudad,
+            p.codigo_postal,
             p.direccion,
-            p.total,
+            p.detalle_direccion,
+            p.get_metodo_pago_display(),
             p.get_estado_display(),
-            p.creado.strftime("%d/%m/%Y"),
+            p.total,
+            p.creado.strftime("%d/%m/%Y %H:%M"),
         ])
 
     return response
