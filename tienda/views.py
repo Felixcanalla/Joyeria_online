@@ -159,8 +159,8 @@ def checkout(request):
                 for item in pedido.items.all()
             ])
 
-            try:
-                send_mail(
+            
+            send_mail(
                     subject=f"Pedido #{pedido.id} recibido",
                     message=f"""
 Hola {pedido.nombre},
@@ -176,13 +176,12 @@ https://rbjoyas.onrender.com/pedido/{pedido.id}/{pedido.token}/
 """,
                     from_email=settings.EMAIL_HOST_USER,
                     recipient_list=[pedido.email],
-                    fail_silently=False,
+                    fail_silently=True,
                 )
-            except Exception as e:
-                print("Error enviando mail cliente:", e)
+            
 
-            try:
-                send_mail(
+            
+            send_mail(
                     subject=f"NUEVO PEDIDO #{pedido.id}",
                     message=f"""
 Nuevo pedido recibido
@@ -208,10 +207,9 @@ https://rbjoyas.onrender.com/pedido/{pedido.id}/{pedido.token}/
 """,
                     from_email=settings.EMAIL_HOST_USER,
                     recipient_list=[settings.EMAIL_VENDEDOR],
-                    fail_silently=False,
+                    fail_silently=True,
                 )
-            except Exception as e:
-                print("Error enviando mail vendedor:", e)
+            
 
             request.session["carrito"] = {}
             request.session["pedido_en_proceso"] = False
