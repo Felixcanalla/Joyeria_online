@@ -4,24 +4,21 @@
 
 <div class="text-center mt-5">
     <h2>¡Pago realizado con éxito! 💳</h2>
-    <p>Recibimos tu pago. La confirmación puede demorar unos segundos.</p>
-    <a 
- <a 
-href="https://wa.me/5493413025642?text=
-🛒%20Nuevo%20pedido%20%23{{ pedido.id }}%0A%0A
-👤%20Cliente:%20{{ pedido.nombre }}%20{{ pedido.apellido }}%0A
-📞%20{{ pedido.telefono }}%0A
-📍%20{{ pedido.direccion }}%20{{ pedido.ciudad }}%0A
-💳%20{{ pedido.get_metodo_pago_display }}%0A
-💰%20Total:%20${{ pedido.total }}%0A%0A
-🔗%20https://rbjoyas.onrender.com/pedido/{{ pedido.id }}/{{ pedido.token }}/
-"
-target="_blank"
-class="btn btn-success w-100 mt-3">
-    <i class="bi bi-whatsapp"></i>
-    Enviar pedido por WhatsApp
-</a>
 
+    <p>
+        Recibimos tu pago. La confirmación puede demorar unos segundos.
+    </p>
+
+    {% if pedido %}
+        <a 
+            href="https://wa.me/5493413025642?text=Nuevo%20pedido%20%23{{ pedido.id }}%0ACliente:%20{{ pedido.nombre }}%20{{ pedido.apellido }}%0ATelefono:%20{{ pedido.telefono }}%0ADireccion:%20{{ pedido.direccion }}%20{{ pedido.ciudad }}%0AMetodo:%20{{ pedido.get_metodo_pago_display }}%0ATotal:%20${{ pedido.total }}%0AVer%20pedido:%20https://rbjoyas.onrender.com/pedido/{{ pedido.id }}/{{ pedido.token }}/"
+            target="_blank"
+            class="btn btn-success w-100 mt-3"
+        >
+            <i class="bi bi-whatsapp"></i>
+            Avisar pedido por WhatsApp
+        </a>
+    {% endif %}
 
     <a href="/" class="btn btn-agregar mt-3">
         Volver a la tienda
