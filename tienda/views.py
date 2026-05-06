@@ -183,7 +183,7 @@ def checkout(request):
             ])
 
             # ✅ 4. Email al cliente
-            try:
+        try:
                 send_mail(
                 subject=f"Pedido #{pedido.id} recibido",
                 message=f"""
