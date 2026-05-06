@@ -253,7 +253,7 @@ def crear_preferencia(pedido):
         "external_reference": str(pedido.id),
         "notification_url": "https://rbjoyas.onrender.com/webhook/mercadopago/",
         "back_urls": {
-            "success": "https://rbjoyas.onrender.com/pago-exitoso/",
+            "success": f"https://rbjoyas.onrender.com/pago-exitoso/?pedido_id={pedido.id}",
             "failure": "https://rbjoyas.onrender.com/",
             "pending": "https://rbjoyas.onrender.com/",
         },
@@ -273,7 +273,15 @@ def crear_preferencia(pedido):
 
 
 def pago_exitoso(request):
-    return render(request, "tienda/pago_exitoso.html")
+    pedido_id = request.GET.get("pedido_id")
+    pedido = None
+
+    if pedido_id:
+        pedido = Pedido.objects.filter(id=pedido_id).first()
+
+    return render(request, "tienda/pago_exitoso.html", {
+        "pedido": pedido
+    })
 
 
 @csrf_exempt
@@ -331,7 +339,7 @@ def transferencia(request, pedido_id):
             pedido.comprobante_transferencia = comprobante
             pedido.save()
 
-        return redirect("pedido_exitoso")
+        return redirect(f"/pedido-exitoso/?pedido_id={pedido.id}")
 
     return render(request, "tienda/transferencia.html", {
         "pedido": pedido
