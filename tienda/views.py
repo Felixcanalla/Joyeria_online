@@ -253,7 +253,7 @@ def crear_preferencia(pedido):
         "external_reference": str(pedido.id),
         "notification_url": "https://rbjoyas.onrender.com/webhook/mercadopago/",
         "back_urls": {
-            "success": f"https://rbjoyas.onrender.com/pago-exitoso/?pedido_id={pedido.id}",
+            "success": f"https://rbjoyas.onrender.com/pedido-exitoso/?pedido_id={pedido.id}",
             "failure": "https://rbjoyas.onrender.com/",
             "pending": "https://rbjoyas.onrender.com/",
         },
