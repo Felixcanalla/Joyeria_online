@@ -183,54 +183,61 @@ def checkout(request):
             ])
 
             # ✅ 4. Email al cliente
-            send_mail(
+            try:
+                send_mail(
                 subject=f"Pedido #{pedido.id} recibido",
                 message=f"""
-Hola {pedido.nombre},
+        Hola {pedido.nombre},
 
-Recibimos tu pedido #{pedido.id}.
+        Recibimos tu pedido #{pedido.id}.
 
-Total: ${pedido.total}
-Método de pago: {pedido.get_metodo_pago_display()}
-Estado: {pedido.get_estado_display()}
+        Total: ${pedido.total}
+        Método de pago: {pedido.get_metodo_pago_display()}
+        Estado: {pedido.get_estado_display()}
 
-Podés ver tu pedido acá:
-http://127.0.0.1:8005/pedido/{pedido.id}/{pedido.token}/
-""",
-                from_email=None,
+        Podés ver tu pedido acá:
+        https://rbjoyas.onrender.com/pedido/{pedido.id}/{pedido.token}/
+        """,
+                from_email=settings.EMAIL_HOST_USER,  # 👈 IMPORTANTE
                 recipient_list=[pedido.email],
-                fail_silently=True,
+                fail_silently=False,  # 👈 IMPORTANTE
             )
+        except Exception as e:
+            print("Error enviando mail cliente:", e)
+            
 
             # ✅ 5. Email al vendedor
-            send_mail(
-                subject=f"🛒 NUEVO PEDIDO #{pedido.id}",
-                message=f"""
-Nuevo pedido recibido
+            try:
+                send_mail(
+                    subject=f"🛒 NUEVO PEDIDO #{pedido.id}",
+                    message=f"""
+            Nuevo pedido recibido
 
-Cliente: {pedido.nombre} {pedido.apellido}
-DNI: {pedido.dni}
-Teléfono: {pedido.telefono}
-Email: {pedido.email}
+            Cliente: {pedido.nombre} {pedido.apellido}
+            DNI: {pedido.dni}
+            Teléfono: {pedido.telefono}
+            Email: {pedido.email}
 
-Dirección:
-{pedido.direccion}, {pedido.ciudad}, {pedido.provincia}
-CP: {pedido.codigo_postal}
+            Dirección:
+            {pedido.direccion}, {pedido.ciudad}, {pedido.provincia}
+            CP: {pedido.codigo_postal}
 
-Productos:
-{productos_texto}
+            Productos:
+            {productos_texto}
 
-Total: ${pedido.total}
-Método de pago: {pedido.get_metodo_pago_display()}
-Estado: {pedido.get_estado_display()}
+            Total: ${pedido.total}
+            Método de pago: {pedido.get_metodo_pago_display()}
+            Estado: {pedido.get_estado_display()}
 
-Ver pedido:
-http://127.0.0.1:8005/pedido/{pedido.id}/{pedido.token}/
-""",
-                from_email=None,
-                recipient_list=[settings.EMAIL_VENDEDOR],  # 👈 usar .env
-                fail_silently=True,
-            )
+            Ver pedido:
+            https://rbjoyas.onrender.com/pedido/{pedido.id}/{pedido.token}/
+            """,
+                    from_email=settings.EMAIL_HOST_USER,  # 👈 CLAVE
+                    recipient_list=[settings.EMAIL_VENDEDOR],
+                    fail_silently=False,  # 👈 CLAVE
+                )
+            except Exception as e:
+                print("Error enviando mail vendedor:", e)
 
             # 🧹 6. Vaciar carrito
             request.session["carrito"] = {}
