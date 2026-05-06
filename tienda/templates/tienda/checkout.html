@@ -45,9 +45,9 @@
 
             <h4>Total: ${{ total }}</h4>
 
-            <button class="btn btn-agregar w-100 mt-3">
-                Confirmar compra
-            </button>
+            <button type="submit" class="btn btn-agregar w-100 mt-3" onclick="this.disabled=true; this.innerText='Procesando...'; this.form.submit();">
+    Confirmar compra
+</button>
         </div>
     </div>
 

@@ -1,0 +1,161 @@
+{% extends 'tienda/base.html' %}
+
+{% block content %}
+
+<h2 class="mb-4">Panel administrativo</h2>
+
+<form method="GET" class="row g-2 mb-4">
+    <div class="col-md-3">
+        <label>Desde</label>
+        <input type="date" name="desde" value="{{ fecha_desde }}" class="form-control">
+    </div>
+
+    <div class="col-md-3">
+        <label>Hasta</label>
+        <input type="date" name="hasta" value="{{ fecha_hasta }}" class="form-control">
+    </div>
+
+    <div class="col-md-3">
+        <label>Estado</label>
+        <select name="estado" class="form-control">
+            <option value="">Todos</option>
+            <option value="pendiente" {% if estado_actual == "pendiente" %}selected{% endif %}>Pendiente</option>
+            <option value="pagado" {% if estado_actual == "pagado" %}selected{% endif %}>Pagado</option>
+            <option value="cancelado" {% if estado_actual == "cancelado" %}selected{% endif %}>Cancelado</option>
+        </select>
+    </div>
+
+    <div class="col-md-3 d-flex align-items-end">
+        <button type="submit" class="btn btn-dark w-100">
+            Filtrar
+        </button>
+    </div>
+
+    <div class="col-md-3 d-flex align-items-end">
+        <a href="{% url 'dashboard_admin' %}" class="btn btn-outline-secondary w-100">
+            Limpiar
+        </a>
+    </div>
+
+    <div class="col-md-3 d-flex align-items-end">
+        <a href="{% url 'exportar_pedidos' %}?desde={{ fecha_desde }}&hasta={{ fecha_hasta }}&estado={{ estado_actual }}" 
+           class="btn btn-success w-100">
+            Exportar filtrados
+        </a>
+    </div>
+</form>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h6>Total vendido</h6>
+            <h3>${{ total_vendido }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h6>Últimos 30 días</h6>
+            <h3>${{ total_vendido_30_dias }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h6>Pedidos pagados</h6>
+            <h3>{{ pedidos_pagados }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h6>Pendientes</h6>
+            <h3>{{ pedidos_pendientes }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-4 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h6>Total pedidos</h6>
+            <h3>{{ pedidos_total }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h6>Transferencias pendientes</h6>
+            <h3>{{ transferencias_pendientes }}</h3>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-3">
+        <div class="card p-3 shadow-sm">
+            <h6>Mercado Pago pendientes</h6>
+            <h3>{{ mercado_pago_pendientes }}</h3>
+        </div>
+    </div>
+</div>
+
+<h4>Últimos pedidos</h4>
+
+<table class="table table-striped table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Método</th>
+            <th>Estado</th>
+            <th>Total</th>
+            <th>Fecha</th>
+            <th>Ver</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pedido in ultimos_pedidos %}
+        <tr>
+            <td>#{{ pedido.id }}</td>
+            <td>{{ pedido.nombre }} {{ pedido.apellido }}</td>
+            <td>{{ pedido.get_metodo_pago_display }}</td>
+            <td>{{ pedido.get_estado_display }}</td>
+            <td>${{ pedido.total }}</td>
+            <td>{{ pedido.creado|date:"d/m/Y H:i" }}</td>
+            <td>
+                <a href="{% url 'ver_pedido' pedido.id pedido.token %}" class="btn btn-sm btn-dark">
+                    Ver
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">No hay pedidos para mostrar.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h4 class="mt-5">Productos con bajo stock</h4>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Stock</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for producto in productos_bajo_stock %}
+        <tr>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ producto.stock }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="2">No hay productos con bajo stock.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

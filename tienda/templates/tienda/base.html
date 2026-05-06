@@ -3,7 +3,7 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}Joyería{% endblock %}</title>
+    <title>{% block title %}RB Joyas{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- Bootstrap -->
@@ -22,7 +22,7 @@
 <body class="d-flex flex-column min-vh-100">
 
 <!-- WhatsApp flotante -->
-<a href="https://wa.me/549XXXXXXXXXX" target="_blank" class="whatsapp-float">
+<a href="https://wa.me/5493413025642" target="_blank" class="whatsapp-float">
     <i class="bi bi-whatsapp"></i>
 </a>
 
@@ -35,7 +35,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm fixed-top">
   <div class="container">
     <a class="navbar-brand" href="{% url 'inicio' %}">
-        Joyería
+        RB Joyas
     </a>
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
@@ -56,7 +56,15 @@
         <li class="nav-item">
             <a class="nav-link" href="{% url 'ver_carrito' %}">
                 <i class="bi bi-cart"></i> Carrito
+
             </a>
+            {% if user.is_staff %}
+    <li class="nav-item">
+        <a class="nav-link btn btn-dark text-white ms-2" href="{% url 'dashboard_admin' %}">
+            Panel Admin
+        </a>
+    </li>
+{% endif %}
         </li>
 
       </ul>
@@ -83,7 +91,7 @@
 <!-- FOOTER -->
 <footer class="bg-dark text-white py-4 mt-auto">
   <div class="container text-center">
-    <p class="mb-1">© 2026 Joyería</p>
+    <p class="mb-1">© 2026 RB Joyas</p>
     <small>Todos los derechos reservados</small>
   </div>
 </footer>

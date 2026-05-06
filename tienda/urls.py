@@ -15,4 +15,6 @@ urlpatterns = [
     path("catalogo/", views.catalogo, name="catalogo"),
     path("categoria/<slug:slug>/", views.productos_por_categoria, name="productos_por_categoria"),
     path("producto/<slug:slug>/", views.detalle_producto, name="detalle_producto"),
+    path("admin-panel/", views.dashboard_admin, name="dashboard_admin"),
+    path("exportar-pedidos/", views.exportar_pedidos_csv, name="exportar_pedidos"),
     ]
