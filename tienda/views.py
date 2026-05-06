@@ -160,55 +160,55 @@ def checkout(request):
             ])
 
             
-            send_mail(
-                    subject=f"Pedido #{pedido.id} recibido",
-                    message=f"""
-Hola {pedido.nombre},
+#             send_mail(
+#                     subject=f"Pedido #{pedido.id} recibido",
+#                     message=f"""
+# Hola {pedido.nombre},
 
-Recibimos tu pedido #{pedido.id}.
+# Recibimos tu pedido #{pedido.id}.
 
-Total: ${pedido.total}
-Método de pago: {pedido.get_metodo_pago_display()}
-Estado: {pedido.get_estado_display()}
+# Total: ${pedido.total}
+# Método de pago: {pedido.get_metodo_pago_display()}
+# Estado: {pedido.get_estado_display()}
 
-Podés ver tu pedido acá:
-https://rbjoyas.onrender.com/pedido/{pedido.id}/{pedido.token}/
-""",
-                    from_email=settings.EMAIL_HOST_USER,
-                    recipient_list=[pedido.email],
-                    fail_silently=True,
-                )
+# Podés ver tu pedido acá:
+# https://rbjoyas.onrender.com/pedido/{pedido.id}/{pedido.token}/
+# """,
+#                     from_email=settings.EMAIL_HOST_USER,
+#                     recipient_list=[pedido.email],
+#                     fail_silently=True,
+#                 )
             
 
             
-            send_mail(
-                    subject=f"NUEVO PEDIDO #{pedido.id}",
-                    message=f"""
-Nuevo pedido recibido
+#             send_mail(
+#                     subject=f"NUEVO PEDIDO #{pedido.id}",
+#                     message=f"""
+# Nuevo pedido recibido
 
-Cliente: {pedido.nombre} {pedido.apellido}
-DNI: {pedido.dni}
-Teléfono: {pedido.telefono}
-Email: {pedido.email}
+# Cliente: {pedido.nombre} {pedido.apellido}
+# DNI: {pedido.dni}
+# Teléfono: {pedido.telefono}
+# Email: {pedido.email}
 
-Dirección:
-{pedido.direccion}, {pedido.ciudad}, {pedido.provincia}
-CP: {pedido.codigo_postal}
+# Dirección:
+# {pedido.direccion}, {pedido.ciudad}, {pedido.provincia}
+# CP: {pedido.codigo_postal}
 
-Productos:
-{productos_texto}
+# Productos:
+# {productos_texto}
 
-Total: ${pedido.total}
-Método de pago: {pedido.get_metodo_pago_display()}
-Estado: {pedido.get_estado_display()}
+# Total: ${pedido.total}
+# Método de pago: {pedido.get_metodo_pago_display()}
+# Estado: {pedido.get_estado_display()}
 
-Ver pedido:
-https://rbjoyas.onrender.com/pedido/{pedido.id}/{pedido.token}/
-""",
-                    from_email=settings.EMAIL_HOST_USER,
-                    recipient_list=[settings.EMAIL_VENDEDOR],
-                    fail_silently=True,
-                )
+# Ver pedido:
+# https://rbjoyas.onrender.com/pedido/{pedido.id}/{pedido.token}/
+# """,
+#                     from_email=settings.EMAIL_HOST_USER,
+#                     recipient_list=[settings.EMAIL_VENDEDOR],
+#                     fail_silently=True,
+#                 )
             
 
             request.session["carrito"] = {}
