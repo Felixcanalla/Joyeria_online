@@ -17,4 +17,5 @@ urlpatterns = [
     path("producto/<slug:slug>/", views.detalle_producto, name="detalle_producto"),
     path("admin-panel/", views.dashboard_admin, name="dashboard_admin"),
     path("exportar-pedidos/", views.exportar_pedidos_csv, name="exportar_pedidos"),
+    path("test-email/", views.test_email, name="test_email"),
     ]

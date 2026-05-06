@@ -493,3 +493,25 @@ def exportar_pedidos_csv(request):
         ])
 
     return response
+
+
+
+
+
+
+
+from django.core.mail import send_mail
+from django.http import HttpResponse
+
+
+def test_email(request):
+
+    send_mail(
+        subject="Prueba Brevo",
+        message="Si recibís esto, Brevo funciona.",
+        from_email="rbjoyasdeplata@gmail.com",
+        recipient_list=["TU_MAIL_REAL@gmail.com"],
+        fail_silently=False,
+    )
+
+    return HttpResponse("Mail enviado")
