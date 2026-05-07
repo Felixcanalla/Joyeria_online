@@ -42,7 +42,7 @@
                 <div class="card-body d-flex flex-column">
                     <h5 class="card-title">{{ producto.nombre }}</h5>
 
-                 <h5 class="card-title">{{ producto.nombre }}</h5>
+               
 
 {% if producto.stock > 5 %}
     <p class="text-success small mb-2">
@@ -63,8 +63,39 @@
                     </p>
 
                     <a href="{% url 'detalle_producto' producto.slug %}" class="btn btn-outline-dark mb-2">
-                        Ver detalle
-                    </a>
+    Ver detalle
+</a>
+
+<div class="share-buttons mb-3">
+
+    <a
+        href="https://wa.me/?text=Mirá este producto de RB Joyas: {{ request.scheme }}://{{ request.get_host }}{% url 'detalle_producto' producto.slug %}"
+        target="_blank"
+        class="share-btn whatsapp"
+        title="Compartir por WhatsApp"
+    >
+        <i class="bi bi-whatsapp"></i>
+    </a>
+
+    <a
+        href="https://www.facebook.com/sharer/sharer.php?u={{ request.scheme }}://{{ request.get_host }}{% url 'detalle_producto' producto.slug %}"
+        target="_blank"
+        class="share-btn facebook"
+        title="Compartir en Facebook"
+    >
+        <i class="bi bi-facebook"></i>
+    </a>
+
+    <button
+        type="button"
+        class="share-btn copiar-link border-0"
+        onclick="copiarLink('{{ request.scheme }}://{{ request.get_host }}{% url 'detalle_producto' producto.slug %}')"
+        title="Copiar enlace"
+    >
+        <i class="bi bi-link-45deg"></i>
+    </button>
+
+</div>
 
                     {% if producto.stock > 0 %}
                         <form method="POST" action="{% url 'agregar_al_carrito' producto.id %}">
@@ -96,5 +127,16 @@
         </div>
     {% endfor %}
 </div>
+
+<script>
+
+function copiarLink(url) {
+
+    navigator.clipboard.writeText(url);
+
+    alert("Link copiado al portapapeles");
+}
+
+</script>
 
 {% endblock %}
