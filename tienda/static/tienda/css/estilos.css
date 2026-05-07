@@ -352,3 +352,14 @@ footer {
     color: #d4af37;
     transform: scale(1.15);
 }
+
+
+
+
+.copiar-link {
+    background: #6c757d;
+}
+
+.copiar-link:hover {
+    background: #5a6268;
+}

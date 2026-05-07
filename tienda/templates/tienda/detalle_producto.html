@@ -66,13 +66,13 @@
             </a>
 
             <button
-                type="button"
-                class="share-btn instagram border-0"
-                onclick="copiarLink()"
-                title="Copiar enlace para Instagram"
-            >
-                <i class="bi bi-instagram"></i>
-            </button>
+    type="button"
+    class="share-btn copiar-link border-0"
+    onclick="copiarLink()"
+    title="Copiar enlace del producto"
+>
+    <i class="bi bi-link-45deg"></i>
+</button>
 
         </div>
 
@@ -154,7 +154,7 @@ function copiarLink() {
 
     navigator.clipboard.writeText(window.location.href);
 
-    alert("Link copiado. Ahora podés pegarlo en Instagram.");
+    alert("Link del producto copiado.");
 }
 </script>
 {% endif %}

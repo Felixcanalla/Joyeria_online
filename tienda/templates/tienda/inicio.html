@@ -84,14 +84,14 @@
                             <i class="bi bi-facebook"></i>
                         </a>
 
-                        <a
-                            href="https://www.instagram.com/"
-                            target="_blank"
-                            class="share-btn instagram"
-                            title="Compartir en Instagram"
-                        >
-                            <i class="bi bi-instagram"></i>
-                        </a>
+                       <button
+    type="button"
+    class="share-btn copiar-link border-0"
+    onclick="copiarLink('{{ request.scheme }}://{{ request.get_host }}{% url 'detalle_producto' producto.slug %}')"
+    title="Copiar enlace"
+>
+    <i class="bi bi-link-45deg"></i>
+</button>
                     </div>
 
                     {% if producto.stock > 0 %}
@@ -130,5 +130,14 @@
         </div>
     {% endfor %}
 </div>
+
+<script>
+function copiarLink(url) {
+
+    navigator.clipboard.writeText(url);
+
+    alert("Link copiado al portapapeles");
+}
+</script>
 
 {% endblock %}
