@@ -1,20 +1,31 @@
 {% extends 'tienda/base.html' %}
 
+{% load static %}
+
 {% block title %}Inicio | Joyería{% endblock %}
 
 {% block content %}
 
-<h1 class="text-center mb-3" style="font-family: 'Playfair Display', serif;">
-    Joyería Online
-</h1>
+<a href="{% url 'catalogo' %}" class="hero-link">
 
-<p class="text-center text-muted mb-5">
-    Descubrí nuestros productos
-</p>
+    <section 
+        class="hero-banner"
+        style="background-image: url('{% static 'tienda/img/banner-joyas.png' %}');"
+    >
+
+       
+       
+
+    </section>
+
+</a>
 
 <div class="row g-4">
+
     {% for producto in productos %}
+
         <div class="col-6 col-md-4 col-lg-3">
+
             <div class="card card-producto h-100 position-relative">
 
                 {% if producto.destacado %}
@@ -24,13 +35,25 @@
                 {% endif %}
 
                 <a href="{% url 'detalle_producto' producto.slug %}">
+
                     {% if producto.imagen %}
-                        <img src="{{ producto.imagen.url }}" class="card-img-top" alt="{{ producto.nombre }}">
+
+                        <img 
+                            src="{{ producto.imagen.url }}" 
+                            class="card-img-top"
+                            alt="{{ producto.nombre }}"
+                        >
+
                     {% else %}
+
                         <div class="card-img-top d-flex align-items-center justify-content-center bg-light">
-                            <span class="text-muted">Sin imagen</span>
+                            <span class="text-muted">
+                                Sin imagen
+                            </span>
                         </div>
+
                     {% endif %}
+
                 </a>
 
                 <div class="card-body d-flex flex-column">
@@ -40,17 +63,23 @@
                     </h5>
 
                     {% if producto.stock > 5 %}
+
                         <span class="text-success small mb-2">
                             Stock disponible: {{ producto.stock }}
                         </span>
+
                     {% elif producto.stock > 0 %}
+
                         <span class="text-warning small mb-2">
                             Últimas {{ producto.stock }} unidades
                         </span>
+
                     {% else %}
+
                         <span class="text-danger small mb-2">
                             Sin stock
                         </span>
+
                     {% endif %}
 
                     <p class="card-text text-muted small mb-3">
@@ -61,11 +90,15 @@
                         ${{ producto.precio }}
                     </p>
 
-                    <a href="{% url 'detalle_producto' producto.slug %}" class="btn btn-outline-dark mb-2">
+                    <a 
+                        href="{% url 'detalle_producto' producto.slug %}" 
+                        class="btn btn-outline-dark mb-2"
+                    >
                         Ver detalle
                     </a>
 
                     <div class="share-buttons mb-3">
+
                         <a
                             href="https://wa.me/?text=Mirá este producto de RB Joyas: {{ request.scheme }}://{{ request.get_host }}{% url 'detalle_producto' producto.slug %}"
                             target="_blank"
@@ -84,21 +117,25 @@
                             <i class="bi bi-facebook"></i>
                         </a>
 
-                       <button
-    type="button"
-    class="share-btn copiar-link border-0"
-    onclick="copiarLink('{{ request.scheme }}://{{ request.get_host }}{% url 'detalle_producto' producto.slug %}')"
-    title="Copiar enlace"
->
-    <i class="bi bi-link-45deg"></i>
-</button>
+                        <button
+                            type="button"
+                            class="share-btn copiar-link border-0"
+                            onclick="copiarLink('{{ request.scheme }}://{{ request.get_host }}{% url 'detalle_producto' producto.slug %}')"
+                            title="Copiar enlace"
+                        >
+                            <i class="bi bi-link-45deg"></i>
+                        </button>
+
                     </div>
 
                     {% if producto.stock > 0 %}
+
                         <form method="POST" action="{% url 'agregar_al_carrito' producto.id %}">
+
                             {% csrf_token %}
 
                             <div class="input-group">
+
                                 <input 
                                     type="number" 
                                     name="cantidad" 
@@ -111,33 +148,48 @@
                                 <button type="submit" class="btn btn-agregar">
                                     <i class="bi bi-cart-plus"></i>
                                 </button>
+
                             </div>
+
                         </form>
+
                     {% else %}
+
                         <button class="btn btn-secondary w-100" disabled>
                             Sin stock
                         </button>
+
                     {% endif %}
 
                 </div>
+
             </div>
+
         </div>
+
     {% empty %}
+
         <div class="col-12">
+
             <div class="alert alert-info text-center">
                 Todavía no hay productos cargados.
             </div>
+
         </div>
+
     {% endfor %}
+
 </div>
 
 <script>
+
 function copiarLink(url) {
 
     navigator.clipboard.writeText(url);
 
     alert("Link copiado al portapapeles");
 }
+
 </script>
 
 {% endblock %}
