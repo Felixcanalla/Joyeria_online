@@ -4,24 +4,24 @@
 
 {% block content %}
 
-<h1 class="text-center mb-4" style="font-family: 'Playfair Display', serif;">
+<h1 class="text-center mb-3" style="font-family: 'Playfair Display', serif;">
     Joyería Online
 </h1>
 
 <p class="text-center text-muted mb-5">
-    Descubrí nuestros productos destacados
+    Descubrí nuestros productos
 </p>
 
 <div class="row g-4">
     {% for producto in productos %}
         <div class="col-6 col-md-4 col-lg-3">
-            <div class="card h-100 shadow-sm position-relative">
+            <div class="card card-producto h-100 position-relative">
 
-    {% if producto.destacado %}
-        <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-2">
-            ⭐ Destacado
-        </span>
-    {% endif %}
+                {% if producto.destacado %}
+                    <span class="badge badge-destacado position-absolute top-0 start-0 m-2">
+                        ⭐ Destacado
+                    </span>
+                {% endif %}
 
                 <a href="{% url 'detalle_producto' producto.slug %}">
                     {% if producto.imagen %}
@@ -34,30 +34,30 @@
                 </a>
 
                 <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ producto.nombre }}</h5>
 
+                    <h5 class="card-title fw-semibold mb-1">
+                        {{ producto.nombre }}
+                    </h5>
 
-                    <h5 class="card-title">{{ producto.nombre }}</h5>
+                    {% if producto.stock > 5 %}
+                        <span class="text-success small mb-2">
+                            Stock disponible: {{ producto.stock }}
+                        </span>
+                    {% elif producto.stock > 0 %}
+                        <span class="text-warning small mb-2">
+                            Últimas {{ producto.stock }} unidades
+                        </span>
+                    {% else %}
+                        <span class="text-danger small mb-2">
+                            Sin stock
+                        </span>
+                    {% endif %}
 
-{% if producto.stock > 5 %}
-    <p class="text-success small mb-2">
-        Stock disponible: {{ producto.stock }}
-    </p>
-{% elif producto.stock > 0 %}
-    <p class="text-warning small mb-2">
-        🔥 Últimas unidades: {{ producto.stock }}
-    </p>
-{% else %}
-    <p class="text-danger small mb-2">
-        ❌ Sin stock
-    </p>
-{% endif %}
-
-                    <p class="card-text text-muted small">
-                        {{ producto.descripcion|truncatewords:12 }}
+                    <p class="card-text text-muted small mb-3">
+                        {{ producto.descripcion|truncatewords:10 }}
                     </p>
 
-                    <p class="fw-bold fs-5 mt-auto">
+                    <p class="fw-bold fs-5 mt-auto mb-3">
                         ${{ producto.precio }}
                     </p>
 
@@ -89,8 +89,8 @@
                             Sin stock
                         </button>
                     {% endif %}
-                </div>
 
+                </div>
             </div>
         </div>
     {% empty %}

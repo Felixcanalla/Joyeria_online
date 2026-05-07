@@ -168,3 +168,40 @@ footer {
   background: #333;
   transform: scale(1.1);
 }
+
+
+
+.card-producto {
+    border: none;
+    border-radius: 18px;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-producto:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+.card-producto img {
+    height: 230px;
+    object-fit: cover;
+}
+
+.badge-destacado {
+    background: #c4a35a;
+    color: #111;
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border-radius: 999px;
+}
+
+
+
+.detalle-img {
+    max-height: 520px;
+    width: 100%;
+    object-fit: cover;
+}
+
+
