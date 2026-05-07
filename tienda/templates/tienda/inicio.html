@@ -65,6 +65,35 @@
                         Ver detalle
                     </a>
 
+                    <div class="share-buttons mb-3">
+                        <a
+                            href="https://wa.me/?text=Mirá este producto de RB Joyas: {{ request.scheme }}://{{ request.get_host }}{% url 'detalle_producto' producto.slug %}"
+                            target="_blank"
+                            class="share-btn whatsapp"
+                            title="Compartir por WhatsApp"
+                        >
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+
+                        <a
+                            href="https://www.facebook.com/sharer/sharer.php?u={{ request.scheme }}://{{ request.get_host }}{% url 'detalle_producto' producto.slug %}"
+                            target="_blank"
+                            class="share-btn facebook"
+                            title="Compartir en Facebook"
+                        >
+                            <i class="bi bi-facebook"></i>
+                        </a>
+
+                        <a
+                            href="https://www.instagram.com/"
+                            target="_blank"
+                            class="share-btn instagram"
+                            title="Compartir en Instagram"
+                        >
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                    </div>
+
                     {% if producto.stock > 0 %}
                         <form method="POST" action="{% url 'agregar_al_carrito' producto.id %}">
                             {% csrf_token %}
