@@ -523,3 +523,7 @@ def test_email(request):
     )
 
     return HttpResponse("Mail enviado")
+
+
+def contacto(request):
+    return render(request, 'tienda/contacto.html')

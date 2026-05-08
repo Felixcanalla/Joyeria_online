@@ -18,4 +18,5 @@ urlpatterns = [
     path("admin-panel/", views.dashboard_admin, name="dashboard_admin"),
     path("exportar-pedidos/", views.exportar_pedidos_csv, name="exportar_pedidos"),
     path("test-email/", views.test_email, name="test_email"),
+    path('contacto/', views.contacto, name='contacto'),
     ]
