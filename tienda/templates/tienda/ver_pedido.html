@@ -2,32 +2,96 @@
 
 {% block content %}
 
-<h2 class="mb-4">Pedido #{{ pedido.id }}</h2>
+<h2 class="mb-4">
+    Pedido #{{ pedido.id }}
+</h2>
 
-<div class="card p-4 mb-3">
-    <p><strong>Estado:</strong> {{ pedido.estado }}</p>
-    <p><strong>Método de pago:</strong> {{ pedido.metodo_pago }}</p>
-    <p><strong>Total:</strong> ${{ pedido.total }}</p>
+<div class="card p-4 mb-4">
+
+    <p>
+        <strong>Estado:</strong> {{ pedido.estado }}
+    </p>
+
+    <p>
+        <strong>Método de pago:</strong> {{ pedido.metodo_pago }}
+    </p>
+
+    <p class="mb-0">
+        <strong>Total:</strong> ${{ pedido.total }}
+    </p>
+
 </div>
 
-<h4>Productos</h4>
+<h4 class="mb-3">
+    Productos
+</h4>
 
-<ul class="list-group mb-3">
+<ul class="list-group mb-4">
+
     {% for item in pedido.items.all %}
+
         <li class="list-group-item d-flex justify-content-between">
+
             {{ item.nombre_producto }} x{{ item.cantidad }}
-            <span>${{ item.subtotal }}</span>
+
+            <span>
+                ${{ item.subtotal }}
+            </span>
+
         </li>
+
     {% endfor %}
+
 </ul>
 
-<h4>Datos de envío</h4>
+<h4 class="mb-3">
+    Datos de envío
+</h4>
 
-<div class="card p-3">
-    <p>{{ pedido.nombre }} {{ pedido.apellido }}</p>
-    <p>{{ pedido.direccion }}</p>
-    <p>{{ pedido.ciudad }} - {{ pedido.provincia }}</p>
-    <p>CP: {{ pedido.codigo_postal }}</p>
+<div class="card p-3 mb-4">
+
+    <p>
+        {{ pedido.nombre }} {{ pedido.apellido }}
+    </p>
+
+    <p>
+        {{ pedido.direccion }}
+    </p>
+
+    <p>
+        {{ pedido.ciudad }} - {{ pedido.provincia }}
+    </p>
+
+    <p class="mb-0">
+        CP: {{ pedido.codigo_postal }}
+    </p>
+
 </div>
+
+{% if pedido.metodo_pago == "efectivo" %}
+
+<div class="alert alert-warning p-4">
+
+    <h5 class="mb-3">
+        Pago en efectivo
+    </h5>
+
+    <p class="mb-3">
+        Tu pedido fue registrado correctamente.
+        Comunicate con nosotros para coordinar el pago y la entrega.
+    </p>
+
+    <a 
+        href="https://wa.me/5493413025642?text=Hola,%20quiero%20coordinar%20el%20pedido%20%23{{ pedido.id }}"
+        target="_blank"
+        class="btn btn-success"
+    >
+        <i class="bi bi-whatsapp"></i>
+        Coordinar por WhatsApp
+    </a>
+
+</div>
+
+{% endif %}
 
 {% endblock %}
