@@ -30,6 +30,7 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = ["*"]
+SITE_URL = config("SITE_URL", default="https://rbjoyas.onrender.com")
 
 
 # Application definition
